@@ -1,0 +1,11 @@
+[project]
+name = "fx-570es-plus-2"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.10.11"
+dependencies = [
+    "pyside6>=6.12.0",
+    "pytest>=9.1.1",
+    "sympy>=1.14.0",
+]

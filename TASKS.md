@@ -1,0 +1,135 @@
+# Scientific Calculator — TASKS.md
+
+## Goal
+
+Build a free, offline, native Windows scientific calculator inspired by the Casio fx-570ES PLUS-2 (2nd Edition).
+
+The application must support all documented calculator functions, familiar key behavior, natural mathematical display, and full keyboard/mouse interaction.
+
+## Tech Stack
+
+- Python 3.10.11
+- PySide6 — Native desktop interface
+- SymPy — Mathematical computation support
+- pytest — Automated testing
+- uv — Dependency and project management
+- Windows 10/11 — Target platforms
+
+## Project Rules
+
+1. Build our own application, UI, state management, and calculator logic.
+2. Do not reuse Casio firmware, ROMs, or third-party calculator implementations.
+3. Use documented dependencies from trusted distribution sources.
+4. Use the official Casio manual as the functional reference.
+5. Every functional feature must have tests.
+6. No placeholder buttons in completed features.
+7. Keep modules small and avoid unnecessary abstractions.
+8. Complete and validate each phase before moving forward.
+9. Do not mark tasks complete without working implementation.
+10. Maintain a feature checklist covering all documented operations.
+
+---
+
+## Phase 1 — Application Foundation
+
+**Goal:** A functional Windows application with complete calculator controls.
+
+- [ ] Establish clean project structure and application entry point.
+- [ ] Create the calculator window with original styling and familiar key layout.
+- [ ] Implement the calculator display, menus, and button components.
+- [ ] Implement keyboard/numpad/mouse input and arrow navigation.
+- [ ] Implement SHIFT, ALPHA, DEL, AC, MODE, and SETUP interaction states.
+- [ ] Add initial UI, input, and application-launch tests.
+
+**Done when:** The application launches, every key dispatches the correct action, navigation works, and foundation tests pass.
+
+## Phase 2 — Core Mathematics & Display
+
+**Goal:** A fully usable scientific calculator in COMP mode.
+
+- [ ] Build the expression parser, evaluation engine, and error handling.
+- [ ] Implement arithmetic, parentheses, precedence, fractions, powers, roots, and factorials.
+- [ ] Implement trigonometric, inverse, hyperbolic, logarithmic, exponential, and related functions.
+- [ ] Implement mathematical constants, percentages, permutations, combinations, and random functions.
+- [ ] Implement Natural Textbook Display, cursor editing, and exact/decimal result switching.
+- [ ] Implement Ans, variable memory, replay/history, DEG/RAD/GRA, Fix/Sci/Norm, and engineering notation.
+- [ ] Implement remaining COMP operations, including coordinate conversion, DMS, numerical calculus, summation, CALC, and SOLVE.
+- [ ] Add automated tests for all completed COMP functions.
+
+**Done when:** All documented COMP operations work and their tests pass.
+
+## Phase 3 — Advanced Calculator Modes
+
+**Goal:** Implement all remaining calculation modes.
+
+- [ ] CMPLX — Complex number arithmetic and display.
+- [ ] STAT — Data entry, statistics, regression, and distributions.
+- [ ] BASE-N — Binary, octal, decimal, hexadecimal, and logical operations.
+- [ ] EQN — Equation systems and polynomial solving.
+- [ ] MATRIX — Matrix editing and operations.
+- [ ] TABLE — Function tables for f(x) and g(x).
+- [ ] VECTOR — Vector editing and operations.
+- [ ] Implement scientific constants, metric conversions, and any remaining documented features.
+- [ ] Add automated tests for every mode.
+
+**Done when:** Every documented calculator mode and operation is implemented and tested.
+
+## Phase 4 — Compatibility & Quality Assurance
+
+**Goal:** Validate calculator behavior and stability.
+
+- [ ] Audit all functions, key combinations, menus, and settings against the official manual.
+- [ ] Verify mathematical accuracy, precision, rounding, and exact result formatting.
+- [ ] Verify error conditions, boundary cases, and mode transitions.
+- [ ] Test complete keyboard and mouse workflows.
+- [ ] Test layout scaling, input speed, and repeated operations.
+- [ ] Resolve known defects and run the complete regression suite.
+
+**Done when:** The feature checklist is complete, all tests pass, and no known critical defects remain.
+
+## Phase 5 — Windows Release
+
+**Goal:** Deliver a complete Windows desktop application.
+
+- [ ] Add persistent preferences and configurable keyboard shortcuts.
+- [ ] Add application icon, metadata, and version information.
+- [ ] Package the application for offline Windows use.
+- [ ] Verify startup and calculator operation on a clean Windows environment.
+- [ ] Complete dependency/license checks and final release validation.
+- [ ] Produce the final Windows executable and installation instructions.
+
+**Done when:** The released application installs, launches, and works offline without a separate Python installation.
+
+---
+
+## Completion Criteria
+
+The project is finished only when:
+
+- [ ] All documented fx-570ES PLUS-2 features are covered.
+- [ ] All eight calculation modes work.
+- [ ] Natural mathematical input/output works.
+- [ ] All supported keyboard and mouse interactions work.
+- [ ] Automated tests pass.
+- [ ] No known critical bugs remain.
+- [ ] The application runs offline on Windows 10/11.
+- [ ] A distributable Windows release is available.
+
+## References
+
+Official calculator:
+https://www.casio.com/mea-en/scientific-calculators/product.FX-570ESPLUS-2/
+
+Official user guide:
+https://www.casio.com/content/dam/casio/global/support/manuals/calculators/pdf/2022/mutual/fx-570ES_991ES_9910NG_PLUS_EN.pdf
+
+## Current Progress
+
+- [x] Initialize uv project.
+- [x] Create Python virtual environment.
+- [x] Install PySide6, SymPy, and pytest.
+- [ ] Phase 1 — Application Foundation.
+- [ ] Phase 2 — Core Mathematics & Display.
+- [ ] Phase 3 — Advanced Calculator Modes.
+- [ ] Phase 4 — Compatibility & Quality Assurance.
+- [ ] Phase 5 — Windows Release.
