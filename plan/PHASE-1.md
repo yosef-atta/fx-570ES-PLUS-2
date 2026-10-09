@@ -2,7 +2,7 @@
 
 **Project:** Scientific Calculator — fx-570ES PLUS-2 Inspired  
 **Phase:** 1 — Application Foundation  
-**Status:** Not Started  
+**Status:** Completed  
 **Target:** Windows 10/11  
 **Python:** 3.10.11  
 **Dependencies:** PySide6, SymPy, pytest, uv
