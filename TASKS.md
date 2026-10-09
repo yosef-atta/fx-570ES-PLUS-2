@@ -34,12 +34,12 @@ The application must support all documented calculator functions, familiar key b
 
 **Goal:** A functional Windows application with complete calculator controls.
 
-- [ ] Establish clean project structure and application entry point.
-- [ ] Create the calculator window with original styling and familiar key layout.
-- [ ] Implement the calculator display, menus, and button components.
-- [ ] Implement keyboard/numpad/mouse input and arrow navigation.
-- [ ] Implement SHIFT, ALPHA, DEL, AC, MODE, and SETUP interaction states.
-- [ ] Add initial UI, input, and application-launch tests.
+- [x] Establish clean project structure and application entry point.
+- [x] Create the calculator window with original styling and familiar key layout.
+- [x] Implement the calculator display, menus, and button components.
+- [x] Implement keyboard/numpad/mouse input and arrow navigation.
+- [x] Implement SHIFT, ALPHA, DEL, AC, MODE, and SETUP interaction states.
+- [x] Add initial UI, input, and application-launch tests.
 
 **Done when:** The application launches, every key dispatches the correct action, navigation works, and foundation tests pass.
 
@@ -128,7 +128,7 @@ https://www.casio.com/content/dam/casio/global/support/manuals/calculators/pdf/2
 - [x] Initialize uv project.
 - [x] Create Python virtual environment.
 - [x] Install PySide6, SymPy, and pytest.
-- [ ] Phase 1 — Application Foundation.
+- [x] Phase 1 — Application Foundation.
 - [ ] Phase 2 — Core Mathematics & Display.
 - [ ] Phase 3 — Advanced Calculator Modes.
 - [ ] Phase 4 — Compatibility & Quality Assurance.
