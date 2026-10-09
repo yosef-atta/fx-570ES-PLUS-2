@@ -16,6 +16,7 @@ class MainWindow(QMainWindow):
         self.setWindowTitle("Scientific Calculator")
         self.setMinimumSize(470, 690)
         self.resize(560, 760)
+        self.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
         self.setStyleSheet(STYLESHEET)
         shell = QWidget()
         shell.setObjectName("shell")
