@@ -28,7 +28,20 @@ class Controller:
         if not s.power_on:
             if key_id == "on":
                 s.power_on = True
+                s.shift_active = False
+                s.alpha_active = False
+                s.active_menu = None
                 self.notify()
+            return
+        if key_id == "on":
+            s.power_on = True
+            s.active_menu = None
+            s.shift_active = False
+            s.alpha_active = False
+            s.expression = ""
+            s.cursor_position = 0
+            s.result = ""
+            self.notify()
             return
         if s.active_menu:
             self._menu_key(key_id)
@@ -48,11 +61,14 @@ class Controller:
 
     def dispatch(self, action: Action) -> None:
         s = self.state
+        if not s.power_on and action.name != "on":
+            return
         s.last_action = action.name
         if action.kind is Kind.INSERT:
             position = s.cursor_position
             if s.input_mode == "Overwrite" and position < len(s.expression):
-                s.expression = s.expression[:position] + action.text + s.expression[position + 1:]
+                end_pos = min(len(s.expression), position + len(action.text))
+                s.expression = s.expression[:position] + action.text + s.expression[end_pos:]
             else:
                 s.expression = s.expression[:position] + action.text + s.expression[position:]
             s.cursor_position += len(action.text)
@@ -79,8 +95,16 @@ class Controller:
         elif action.name == "off":
             s.power_on = False
             s.active_menu = None
+            s.shift_active = False
+            s.alpha_active = False
         elif action.name == "on":
             s.power_on = True
+            s.active_menu = None
+            s.shift_active = False
+            s.alpha_active = False
+            s.expression = ""
+            s.cursor_position = 0
+            s.result = ""
         elif action.name == "insert_toggle":
             s.input_mode = "Overwrite" if s.input_mode == "Insert" else "Insert"
         self.notify()
@@ -92,8 +116,10 @@ class Controller:
     def _menu_key(self, key_id: str) -> None:
         s = self.state
         options = MODES if s.active_menu == "MODE" else SETUP
-        if key_id == "ac":
+        if key_id in ("ac", "on"):
             s.active_menu = None
+            s.menu_page = 0
+            s.menu_selection = 0
             return
         if key_id in ("left", "up"):
             s.menu_selection = max(0, s.menu_selection - 1)
@@ -105,7 +131,8 @@ class Controller:
                 self._select(options[index])
             return
         elif key_id == "equals":
-            self._select(options[s.menu_selection])
+            if 0 <= s.menu_selection < len(options):
+                self._select(options[s.menu_selection])
             return
         else:
             return

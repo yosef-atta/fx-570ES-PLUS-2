@@ -30,3 +30,15 @@ class CalculatorState:
             raise ValueError("Cursor out of bounds")
         if self.shift_active and self.alpha_active:
             raise ValueError("Both modifiers active")
+
+    def reset(self) -> None:
+        self.expression = ""
+        self.cursor_position = 0
+        self.result = ""
+        self.shift_active = False
+        self.alpha_active = False
+        self.active_menu = None
+        self.menu_page = 0
+        self.menu_selection = 0
+        self.last_action = ""
+

@@ -8,9 +8,17 @@ KEYS = {
     Qt.Key.Key_Right: "right", Qt.Key.Key_Up: "up",
     Qt.Key.Key_Down: "down", Qt.Key.Key_F2: "shift",
     Qt.Key.Key_F3: "alpha", Qt.Key.Key_F4: "mode",
+    Qt.Key.Key_Plus: "add", Qt.Key.Key_Minus: "subtract",
+    Qt.Key.Key_Asterisk: "multiply", Qt.Key.Key_Slash: "divide",
+    Qt.Key.Key_Period: "dot", Qt.Key.Key_Comma: "comma",
+    Qt.Key.Key_Equal: "equals",
 }
-CHARACTERS = {"+": "add", "-": "subtract", "*": "multiply", "/": "divide",
-              ".": "dot", ",": "comma", "(": "lparen", ")": "rparen"}
+CHARACTERS = {
+    "+": "add", "-": "subtract", "*": "multiply", "/": "divide",
+    ".": "dot", ",": "comma", "(": "lparen", ")": "rparen",
+    "=": "equals", "^": "power", "%": "percent",
+    "x": "multiply", "X": "multiply",
+}
 
 def key_to_id(event) -> str | None:
     if event.key() == Qt.Key.Key_F5:
