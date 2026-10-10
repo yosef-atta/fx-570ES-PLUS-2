@@ -47,14 +47,14 @@ The application must support all documented calculator functions, familiar key b
 
 **Goal:** A fully usable scientific calculator in COMP mode.
 
-- [ ] Build the expression parser, evaluation engine, and error handling.
-- [ ] Implement arithmetic, parentheses, precedence, fractions, powers, roots, and factorials.
-- [ ] Implement trigonometric, inverse, hyperbolic, logarithmic, exponential, and related functions.
-- [ ] Implement mathematical constants, percentages, permutations, combinations, and random functions.
-- [ ] Implement Natural Textbook Display, cursor editing, and exact/decimal result switching.
-- [ ] Implement Ans, variable memory, replay/history, DEG/RAD/GRA, Fix/Sci/Norm, and engineering notation.
-- [ ] Implement remaining COMP operations, including coordinate conversion, DMS, numerical calculus, summation, CALC, and SOLVE.
-- [ ] Add automated tests for all completed COMP functions.
+- [x] Build the expression parser, evaluation engine, and error handling.
+- [x] Implement arithmetic, parentheses, precedence, fractions, powers, roots, and factorials.
+- [x] Implement trigonometric, inverse, hyperbolic, logarithmic, exponential, and related functions.
+- [x] Implement mathematical constants, percentages, permutations, combinations, and random functions.
+- [x] Implement Natural Textbook Display, cursor editing, and exact/decimal result switching.
+- [x] Implement Ans, variable memory, replay/history, DEG/RAD/GRA, Fix/Sci/Norm, and engineering notation.
+- [x] Implement remaining COMP operations, including coordinate conversion, DMS, numerical calculus, summation, CALC, and SOLVE.
+- [x] Add automated tests for all completed COMP functions.
 
 **Done when:** All documented COMP operations work and their tests pass.
 
@@ -129,7 +129,7 @@ https://www.casio.com/content/dam/casio/global/support/manuals/calculators/pdf/2
 - [x] Create Python virtual environment.
 - [x] Install PySide6, SymPy, and pytest.
 - [x] Phase 1 — Application Foundation.
-- [ ] Phase 2 — Core Mathematics & Display.
+- [x] Phase 2 — Core Mathematics & Display.
 - [ ] Phase 3 — Advanced Calculator Modes.
 - [ ] Phase 4 — Compatibility & Quality Assurance.
 - [ ] Phase 5 — Windows Release.

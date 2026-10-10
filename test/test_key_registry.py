@@ -16,10 +16,11 @@ def test_numeric_keys_insert():
         assert action.kind is Kind.INSERT and action.text == digit
 
 def test_scientific_actions_are_explicitly_deferred():
-    assert resolve("sin").kind is Kind.DEFERRED
+    assert resolve("7", "shift").kind is Kind.DEFERRED  # CONST deferred to Phase 3
+    assert resolve("8", "shift").kind is Kind.DEFERRED  # CONV deferred to Phase 3
     assert resolve("equals").name == "evaluate"
-    assert resolve("cos").kind is Kind.DEFERRED
-    assert resolve("sqrt").kind is Kind.DEFERRED
+    assert resolve("sin").kind is Kind.INSERT
+    assert resolve("sqrt").kind is Kind.INSERT
 
 def test_alpha_variable_mappings():
     alpha_vars = {

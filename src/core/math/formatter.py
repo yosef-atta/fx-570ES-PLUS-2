@@ -1,0 +1,133 @@
+"""Formatting engine for exact/decimal switching, Fix/Sci/Norm, and Engineering notation."""
+import math
+import sympy as sp
+from .evaluator import EvaluationResult
+
+class Formatter:
+    """Formats evaluation results according to display settings and S⇔D toggle state."""
+
+    def __init__(self, number_format: str = "Norm 1", display_format: str = "MthIO-MathO"):
+        self.number_format = number_format  # "Norm 1", "Norm 2", "Fix N", "Sci N"
+        self.display_format = display_format  # "MthIO-MathO", "LineIO"
+
+    def get_representations(self, result: EvaluationResult) -> list[str]:
+        """Returns the list of cyclic representations for the S⇔D button."""
+        exact = result.exact
+        numeric = result.numeric
+
+        reps: list[str] = []
+
+        # 1. Exact representation if available
+        if self.display_format.startswith("MthIO"):
+            if isinstance(exact, sp.Rational) and exact.q != 1:
+                # Proper or improper fraction
+                reps.append(self._format_rational(exact))
+                # Mixed fraction if |numerator| > denominator
+                if abs(exact.p) > exact.q:
+                    reps.append(self._format_mixed_rational(exact))
+            elif isinstance(exact, sp.Expr) and not isinstance(exact, (sp.Integer, sp.Float)):
+                reps.append(self._format_exact_expr(exact))
+
+        # 2. Decimal representation
+        if numeric is not None:
+            dec_str = self.format_number(numeric)
+            if dec_str not in reps:
+                reps.append(dec_str)
+
+        # Fallback if empty
+        if not reps:
+            reps.append(str(exact))
+
+        return reps
+
+    def format_number(self, val: float, eng_shift: int | None = None) -> str:
+        """Formats a floating point number according to Fix/Sci/Norm or ENG shift."""
+        if math.isnan(val):
+            return "Math ERROR"
+        if math.isinf(val):
+            return "Math ERROR"
+
+        # Check for zero
+        if val == 0:
+            if eng_shift is not None:
+                return f"0×10^{eng_shift * 3}"
+            if self.number_format.startswith("Fix"):
+                n = int(self.number_format.split()[-1])
+                return f"0.{'0' * n}" if n > 0 else "0"
+            if self.number_format.startswith("Sci"):
+                n = int(self.number_format.split()[-1])
+                return f"0.{'0' * max(0, n - 1)}×10⁰"
+            return "0"
+
+        # Engineering notation override if eng_shift is specified
+        if eng_shift is not None:
+            return self._format_eng(val, eng_shift)
+
+        # Fix N
+        if self.number_format.startswith("Fix"):
+            n = int(self.number_format.split()[-1])
+            return f"{val:.{n}f}"
+
+        # Sci N
+        if self.number_format.startswith("Sci"):
+            n = int(self.number_format.split()[-1])
+            digits = max(1, n)
+            s = f"{val:.{digits - 1}e}"
+            mant, exp = s.split("e")
+            exp_int = int(exp)
+            return f"{mant}×10^{exp_int}"
+
+        # Norm 1 vs Norm 2
+        # Casio specifications:
+        # Norm 1: exponential for |x| < 10^-2 or |x| >= 10^10
+        # Norm 2: exponential for |x| < 10^-9 or |x| >= 10^10
+        abs_v = abs(val)
+        low_bound = 1e-2 if self.number_format == "Norm 1" else 1e-9
+
+        if abs_v < low_bound or abs_v >= 1e10:
+            # Format as scientific with up to 10 significant digits
+            s = f"{val:.9e}"
+            mant, exp = s.split("e")
+            mant = mant.rstrip("0").rstrip(".")
+            exp_int = int(exp)
+            return f"{mant}×10^{exp_int}"
+
+        # Standard decimal up to 10 significant digits
+        rounded = round(val, 9)
+        # Avoid scientific notation
+        dec = f"{rounded:.10f}".rstrip("0").rstrip(".")
+        return dec if dec else "0"
+
+    def _format_eng(self, val: float, eng_shift: int) -> str:
+        """Formats number with power-of-10 exponent that is a multiple of 3."""
+        if val == 0:
+            return f"0×10^{eng_shift * 3}"
+
+        exp = math.floor(math.log10(abs(val)))
+        eng_exp = (exp // 3) * 3 + (eng_shift * 3)
+        mantissa = val / (10 ** eng_exp)
+
+        # Format mantissa cleanly
+        mant_str = f"{mantissa:.9f}".rstrip("0").rstrip(".")
+        if not mant_str:
+            mant_str = "0"
+        return f"{mant_str}×10^{eng_exp}"
+
+    def _format_rational(self, rat: sp.Rational) -> str:
+        return f"{rat.p}/{rat.q}"
+
+    def _format_mixed_rational(self, rat: sp.Rational) -> str:
+        whole = abs(rat.p) // rat.q
+        rem = abs(rat.p) % rat.q
+        sign = "-" if rat.p < 0 else ""
+        return f"{sign}{whole} {rem}/{rat.q}"
+
+    def _format_exact_expr(self, expr: sp.Expr) -> str:
+        # Clean SymPy string representation into standard calculator format
+        import re
+        s = str(expr)
+        s = s.replace("sqrt", "√")
+        s = s.replace("*", "")
+        s = s.replace("pi", "π")
+        s = re.sub(r'√\((\w+)\)', r'√\1', s)
+        return s
