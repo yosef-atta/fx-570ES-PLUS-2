@@ -2,15 +2,15 @@
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QFrame, QLabel, QVBoxLayout
 from src.core.state import CalculatorState
-from .natural_canvas import render_natural_math
+from .natural_canvas import render_natural_math, render_natural_result
 
 class CalculatorDisplay(QFrame):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setObjectName("lcd")
         layout = QVBoxLayout(self)
-        layout.setContentsMargins(12, 8, 12, 8)
-        layout.setSpacing(4)
+        layout.setContentsMargins(12, 6, 12, 6)
+        layout.setSpacing(2)
         self.indicators = QLabel()
         self.indicators.setObjectName("indicators")
         self.expression = QLabel()
@@ -29,9 +29,10 @@ class CalculatorDisplay(QFrame):
 
         self.result.setAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
         self.result.setTextInteractionFlags(Qt.TextInteractionFlag.NoTextInteraction)
+        self.result.setTextFormat(Qt.TextFormat.RichText)
         layout.addWidget(self.result)
 
-        self.setMinimumHeight(128)
+        self.setMinimumHeight(115)
 
     def render(self, state: CalculatorState) -> None:
         if not state.power_on:
@@ -43,6 +44,27 @@ class CalculatorDisplay(QFrame):
             return
 
         self.setProperty("power", "on")
+        
+        # Calculate horizontal scrolling window for expression
+        MAX_VISIBLE = 16
+        expr = state.expression
+        pos = state.cursor_position
+        
+        if len(expr) <= MAX_VISIBLE:
+            visible_expr = expr
+            cursor_idx = pos
+            has_left = False
+            has_right = False
+        else:
+            half = MAX_VISIBLE // 2
+            start = pos - half
+            start = max(0, min(len(expr) - MAX_VISIBLE, start))
+            end = start + MAX_VISIBLE
+            visible_expr = expr[start:end]
+            cursor_idx = pos - start
+            has_left = (start > 0)
+            has_right = (end < len(expr))
+
         flags = [state.mode, state.angle_unit]
         if state.display_format.startswith("MthIO"):
             flags.append("Math")
@@ -58,6 +80,14 @@ class CalculatorDisplay(QFrame):
             flags.append("ALPHA")
         if state.input_mode == "Overwrite":
             flags.append("INS")
+        if has_left:
+            flags.append("◀")
+        if has_right:
+            flags.append("▶")
+        if getattr(state, "history_has_prev", False):
+            flags.append("▲")
+        if getattr(state, "history_has_next", False):
+            flags.append("▼")
         self.indicators.setText("   ".join(flags))
 
         # Error State rendering
@@ -70,8 +100,10 @@ class CalculatorDisplay(QFrame):
 
         # Normal mathematical display rendering
         is_natural = state.display_format.startswith("MthIO")
-        rendered_expr = render_natural_math(state.expression, state.cursor_position, is_natural=is_natural)
+        rendered_expr = render_natural_math(visible_expr, cursor_idx, is_natural=is_natural)
         self.expression.setText(rendered_expr)
-        self.result.setText(state.result)
+        
+        rendered_result = render_natural_result(state.result, is_natural=is_natural)
+        self.result.setText(rendered_result)
         self.style().unpolish(self)
         self.style().polish(self)

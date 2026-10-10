@@ -28,3 +28,37 @@ def render_natural_math(expr_text: str, cursor_pos: int, is_natural: bool = True
     s = re.sub(r'√\(([^)]+)\)', r'<span style="border-top:1px solid #17271f;">&radic; \1</span>', s)
 
     return s
+
+
+def render_natural_result(result_text: str, is_natural: bool = True) -> str:
+    """Formats an evaluation result string into 2D textbook format if in MthIO mode."""
+    if not result_text:
+        return ""
+    if not is_natural:
+        return html.escape(result_text)
+
+    # 1. Mixed fraction: W N/D e.g. "2 1/3" or "-2 1/3"
+    mixed_match = re.match(r'^(-?\d+)\s+(\d+)/(\d+)$', result_text.strip())
+    if mixed_match:
+        whole, num, den = mixed_match.groups()
+        return (
+            f'<span style="font-size:20px; font-weight:bold; color:#141f16;">{whole}&nbsp;</span>'
+            f'<table style="display:inline-table; vertical-align:middle; text-align:center; border-collapse:collapse; margin:0; padding:0;">'
+            f'<tr><td style="border-bottom:2px solid #141f16; padding:0 3px; font-size:15px; font-weight:bold; color:#141f16; text-align:center;">{num}</td></tr>'
+            f'<tr><td style="padding:0 3px; font-size:15px; font-weight:bold; color:#141f16; text-align:center;">{den}</td></tr>'
+            f'</table>'
+        )
+
+    # 2. Simple fraction: N/D e.g. "109/9000", "-5/6"
+    frac_match = re.match(r'^(-?\d+)/(\d+)$', result_text.strip())
+    if frac_match:
+        num, den = frac_match.groups()
+        return (
+            f'<table style="display:inline-table; vertical-align:middle; text-align:center; border-collapse:collapse; margin:0; padding:0;">'
+            f'<tr><td style="border-bottom:2px solid #141f16; padding:0 4px; font-size:16px; font-weight:bold; color:#141f16; text-align:center;">{num}</td></tr>'
+            f'<tr><td style="padding:0 4px; font-size:16px; font-weight:bold; color:#141f16; text-align:center;">{den}</td></tr>'
+            f'</table>'
+        )
+
+    return html.escape(result_text)
+

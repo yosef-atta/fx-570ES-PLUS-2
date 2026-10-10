@@ -61,10 +61,22 @@ class Evaluator:
             # Parse number into SymPy Integer or Rational
             val_str = node.value
             if "." in val_str:
-                # Convert decimal to rational for exact arithmetic, or float
-                p, q = val_str.split(".")
-                denom = 10 ** len(q)
-                numer = int(p + q) if p else int(q)
+                from fractions import Fraction
+                s = val_str
+                parts = s.split(".")
+                dec_part = parts[1]
+                # Detect repeating tail, e.g. .0121111 or 0.33333 or .16666
+                if len(dec_part) >= 3 and dec_part[-1] == dec_part[-2] == dec_part[-3] and dec_part[-1].isdigit():
+                    s = (parts[0] or "0") + "." + dec_part + dec_part[-1] * max(0, 16 - len(dec_part))
+                try:
+                    f = Fraction(s).limit_denominator(100000)
+                    if abs(float(f) - float(val_str)) < 1e-4:
+                        if len(str(f.numerator)) + len(str(f.denominator)) <= 10:
+                            return sp.Rational(f.numerator, f.denominator)
+                except Exception:
+                    pass
+                denom = 10 ** len(dec_part)
+                numer = int(parts[0] + dec_part) if parts[0] else int(dec_part)
                 return sp.Rational(numer, denom)
             return sp.Integer(int(val_str))
 
