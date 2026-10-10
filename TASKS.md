@@ -78,12 +78,12 @@ The application must support all documented calculator functions, familiar key b
 
 **Goal:** Validate calculator behavior and stability.
 
-- [ ] Audit all functions, key combinations, menus, and settings against the official manual.
-- [ ] Verify mathematical accuracy, precision, rounding, and exact result formatting.
-- [ ] Verify error conditions, boundary cases, and mode transitions.
-- [ ] Test complete keyboard and mouse workflows.
-- [ ] Test layout scaling, input speed, and repeated operations.
-- [ ] Resolve known defects and run the complete regression suite.
+- [x] Audit all functions, key combinations, menus, and settings against the official manual.
+- [x] Verify mathematical accuracy, precision, rounding, and exact result formatting.
+- [x] Verify error conditions, boundary cases, and mode transitions.
+- [x] Test complete keyboard and mouse workflows.
+- [x] Test layout scaling, input speed, and repeated operations.
+- [x] Resolve known defects and run the complete regression suite.
 
 **Done when:** The feature checklist is complete, all tests pass, and no known critical defects remain.
 

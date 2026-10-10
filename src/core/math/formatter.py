@@ -1,5 +1,6 @@
 """Formatting engine for exact/decimal switching, Fix/Sci/Norm, and Engineering notation."""
 import math
+from decimal import Context, Decimal, ROUND_HALF_UP
 import sympy as sp
 from .evaluator import EvaluationResult
 
@@ -25,18 +26,26 @@ class Formatter:
             reps.append(ce.format_complex(exact, "r∠θ"))
             return reps
 
-        # 1. Exact representation if available
+        # 1. Decimal representation first if Fix or Sci is active
+        if self.number_format.startswith(("Fix", "Sci")) and numeric is not None:
+            reps.append(self.format_number(numeric))
+
+        # 2. Exact representation if available
         if self.display_format.startswith("MthIO"):
             if isinstance(exact, sp.Rational) and exact.q != 1:
                 # Proper or improper fraction
-                reps.append(self._format_rational(exact))
+                frac_str = self._format_rational(exact)
+                if frac_str not in reps:
+                    reps.append(frac_str)
                 # Mixed fraction if |numerator| > denominator
                 if abs(exact.p) > exact.q:
                     reps.append(self._format_mixed_rational(exact))
             elif isinstance(exact, sp.Expr) and not isinstance(exact, (sp.Integer, sp.Float)):
-                reps.append(self._format_exact_expr(exact))
+                exact_str = self._format_exact_expr(exact)
+                if exact_str not in reps:
+                    reps.append(exact_str)
 
-        # 2. Decimal representation
+        # 3. Standard Decimal representation if not already included
         if numeric is not None:
             dec_str = self.format_number(numeric)
             if dec_str not in reps:
@@ -74,16 +83,37 @@ class Formatter:
         # Fix N
         if self.number_format.startswith("Fix"):
             n = int(self.number_format.split()[-1])
-            return f"{val:.{n}f}"
+            try:
+                d = Decimal(str(val))
+                quant = Decimal('1e-' + str(n)) if n > 0 else Decimal('1')
+                rounded = d.quantize(quant, rounding=ROUND_HALF_UP)
+                return f"{rounded:.{n}f}"
+            except Exception:
+                return f"{val:.{n}f}"
 
         # Sci N
         if self.number_format.startswith("Sci"):
             n = int(self.number_format.split()[-1])
             digits = max(1, n)
-            s = f"{val:.{digits - 1}e}"
-            mant, exp = s.split("e")
-            exp_int = int(exp)
-            return f"{mant}×10^{exp_int}"
+            try:
+                ctx = Context(prec=digits, rounding=ROUND_HALF_UP)
+                d = ctx.create_decimal(str(val))
+                s = f"{d:e}"
+                mant, exp = s.lower().split("e")
+                if "." not in mant:
+                    mant += "."
+                int_part, frac_part = mant.split(".")
+                needed = (digits - 1) - len(frac_part)
+                if needed > 0:
+                    frac_part += "0" * needed
+                mant = f"{int_part}.{frac_part}" if digits > 1 else int_part
+                exp_int = int(exp)
+                return f"{mant}×10^{exp_int}"
+            except Exception:
+                s = f"{val:.{digits - 1}e}"
+                mant, exp = s.split("e")
+                exp_int = int(exp)
+                return f"{mant}×10^{exp_int}"
 
         # Norm 1 vs Norm 2
         # Casio specifications:

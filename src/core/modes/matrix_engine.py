@@ -114,7 +114,10 @@ class MatrixEngine:
         try:
             res = sp.sympify(s, locals=local_dict)
         except Exception as e:
-            raise MathError(str(e))
+            err_str = str(e)
+            if "size mismatch" in err_str or "ShapeError" in type(e).__name__ or "NonSquareMatrix" in type(e).__name__:
+                raise MathError("Dim ERROR")
+            raise MathError(err_str)
         if isinstance(res, sp.Matrix):
             self.matrices["MATANS"] = res
         return res

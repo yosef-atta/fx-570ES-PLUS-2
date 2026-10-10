@@ -34,6 +34,7 @@ BASE_OPTIONS = ("and", "or", "xor", "xnor", "Not", "Neg", "d", "h", "b", "o")
 EQN_OPTIONS = ("anX+bnY=cn", "anX+bnY+cnZ=dn", "aX²+bX+c=0", "aX³+bX²+cX+d=0")
 MATRIX_OPTIONS = ("Dim", "Data", "MatA", "MatB", "MatC", "MatAns", "det", "Trn")
 VECTOR_OPTIONS = ("Dim", "Data", "VctA", "VctB", "VctC", "VctAns", "Dot")
+HYP_OPTIONS = ("sinh", "cosh", "tanh", "sinh⁻¹", "cosh⁻¹", "tanh⁻¹")
 
 PAGE_SIZE = 6
 OPERATOR_PREFIXES = ("+", "−", "-", "×", "*", "÷", "/", "^", "²", "³", "⁻¹", "!", "%")
@@ -117,6 +118,29 @@ class Controller:
             else:
                 return
 
+        # Handle Setup prompts (Fix 0~9, Sci 0~9, Norm 1~2, Frequency, CMPLX)
+        if s.prompt_name in ("Fix", "Sci", "Norm", "CMPLX_FORMAT", "STAT_FREQ"):
+            if key_id.isdigit():
+                if s.prompt_name == "Fix":
+                    s.number_format = f"Fix {key_id}"
+                elif s.prompt_name == "Sci":
+                    s.number_format = f"Sci {key_id}"
+                elif s.prompt_name == "Norm" and key_id in ("1", "2"):
+                    s.number_format = f"Norm {key_id}"
+                elif s.prompt_name == "CMPLX_FORMAT":
+                    s.complex_format = "a+bi" if key_id == "1" else "r∠θ"
+                elif s.prompt_name == "STAT_FREQ":
+                    s.stat_frequency_on = (key_id == "1")
+                s.prompt_name = None
+                self.notify()
+                return
+            elif key_id in ("ac", "on"):
+                s.prompt_name = None
+                self.notify()
+                return
+            else:
+                return
+
         # Prompt input collection for CONST and CONV (e.g. 2 digits 01~40)
         if s.prompt_name in ("CONST", "CONV"):
             if key_id.isdigit():
@@ -132,6 +156,8 @@ class Controller:
                             s.error_message = "Argument ERROR"
                     elif s.prompt_name == "CONV":
                         try:
+                            if not (1 <= code <= 40):
+                                raise ArgumentError(f"Conversion code must be 1-40 (got {code})")
                             if s.is_evaluated and s.result:
                                 val = float(sp.N(self.memory.ans))
                                 converted = convert_metric(code, val)
@@ -142,6 +168,7 @@ class Controller:
                         except Exception:
                             s.error_state = True
                             s.error_message = "Argument ERROR"
+                            s.result = "[AC]:Cancel  [◀][▶]:Goto"
                     s.prompt_name = None
                     s.prompt_value = ""
                 self.notify()
@@ -403,6 +430,8 @@ class Controller:
             self._open_menu("MATRIX")
         elif action.name == "vector_menu":
             self._open_menu("VECTOR")
+        elif action.name in ("hyp", "inv_hyp"):
+            self._open_menu("HYP")
         elif action.name == "del":
             p = s.cursor_position
             if p:
@@ -572,7 +601,7 @@ class Controller:
                 return
             except Exception as e:
                 s.error_state = True
-                s.error_message = "Dim ERROR" if "Dim" in str(e) else "Math ERROR"
+                s.error_message = "Dim ERROR" if ("Dim" in str(e) or "size mismatch" in str(e)) else "Math ERROR"
                 s.result = "[AC]:Cancel  [◀][▶]:Goto"
                 return
 
@@ -586,7 +615,7 @@ class Controller:
                 return
             except Exception as e:
                 s.error_state = True
-                s.error_message = "Dim ERROR" if "Dim" in str(e) else "Math ERROR"
+                s.error_message = "Dim ERROR" if ("Dim" in str(e) or "dimensions must match" in str(e)) else "Math ERROR"
                 s.result = "[AC]:Cancel  [◀][▶]:Goto"
                 return
 
@@ -619,6 +648,9 @@ class Controller:
                 mode=s.mode
             )
             res = evaluator.evaluate(ast)
+            for var_key, var_val in evaluator.memory.items():
+                if var_key in ("A", "B", "C", "D", "E", "F", "X", "Y", "M"):
+                    self.memory.set_var(var_key, var_val)
             self.formatter.number_format = s.number_format
             self.formatter.display_format = s.display_format
             reps = self.formatter.get_representations(res)
@@ -747,6 +779,8 @@ class Controller:
             return MATRIX_OPTIONS
         elif menu_name == "VECTOR":
             return VECTOR_OPTIONS
+        elif menu_name == "HYP":
+            return HYP_OPTIONS
         return ()
 
     def _menu_key(self, key_id: str) -> None:
@@ -757,10 +791,19 @@ class Controller:
             s.menu_page = 0
             s.menu_selection = 0
             return
-        if key_id in ("left", "up"):
+        max_page = (len(options) - 1) // PAGE_SIZE
+        if key_id == "down":
+            s.menu_page = min(max_page, s.menu_page + 1)
+            s.menu_selection = s.menu_page * PAGE_SIZE
+        elif key_id == "up":
+            s.menu_page = max(0, s.menu_page - 1)
+            s.menu_selection = s.menu_page * PAGE_SIZE
+        elif key_id == "left":
             s.menu_selection = max(0, s.menu_selection - 1)
-        elif key_id in ("right", "down"):
+            s.menu_page = s.menu_selection // PAGE_SIZE
+        elif key_id == "right":
             s.menu_selection = min(len(options) - 1, s.menu_selection + 1)
+            s.menu_page = s.menu_selection // PAGE_SIZE
         elif key_id.isdigit() and key_id != "0":
             val = int(key_id)
             index_paged = s.menu_page * PAGE_SIZE + val - 1
@@ -958,6 +1001,8 @@ class Controller:
                 s.table_editor_active = True
                 s.grid_row = 0
                 s.grid_col = 0
+        elif menu_name == "HYP":
+            self._insert_text(f"{option}(")
         elif menu_name == "CLR":
             if option == "Setup":
                 s.angle_unit = "DEG"
@@ -974,8 +1019,20 @@ class Controller:
             s.angle_unit = option
         elif option in ("MthIO-MathO", "LineIO"):
             s.display_format = option
-        elif option in ("Fix", "Sci", "Norm"):
-            s.number_format = option
+        elif option == "ab/c":
+            s.display_format = "ab/c"
+        elif option == "d/c":
+            s.display_format = "MthIO-MathO"
+        elif option == "Fix":
+            s.prompt_name = "Fix"
+        elif option == "Sci":
+            s.prompt_name = "Sci"
+        elif option == "Norm":
+            s.prompt_name = "Norm"
+        elif option == "CMPLX":
+            s.prompt_name = "CMPLX_FORMAT"
+        elif option == "STAT":
+            s.prompt_name = "STAT_FREQ"
         else:
             s.last_action = "setup:" + option
         s.active_menu, s.menu_page, s.menu_selection = None, 0, 0
