@@ -39,12 +39,14 @@ def test_off_and_on():
     c.press("on")
     assert c.state.power_on
 
-def test_deferred_is_never_a_fake_result():
+def test_const_prompts_and_inserts():
     c = Controller()
     c.press("shift")
-    c.press("7")  # CONST deferred to Phase 3
-    assert c.state.deferred_actions == ["const"]
-    assert "Not implemented" in c.state.result
+    c.press("7")  # CONST prompt
+    assert c.state.prompt_name == "CONST"
+    c.press("3")
+    c.press("5")
+    assert "g" in c.state.expression
 
 def test_modifiers_are_exclusive_and_one_shot():
     c = Controller()

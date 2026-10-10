@@ -91,6 +91,12 @@ KEYWORDS: list[tuple[str, TokenType]] = [
     ("P", TokenType.NPR),
     ("C", TokenType.NCR),
 
+    # Complex functions & Angle
+    ("arg", TokenType.ARG),
+    ("Conjg", TokenType.CONJG),
+    ("conjg", TokenType.CONJG),
+    ("∠", TokenType.ANGLE),
+
     # Constants
     ("π", TokenType.PI),
     ("pi", TokenType.PI),
@@ -107,6 +113,8 @@ KEYWORDS: list[tuple[str, TokenType]] = [
     ("(", TokenType.LPAREN),
     (")", TokenType.RPAREN),
 ]
+# Sort keywords by length descending so longer tokens take precedence (e.g. Conjg before C)
+KEYWORDS.sort(key=lambda p: len(p[0]), reverse=True)
 
 # Variables: single letters
 VARIABLES = {"A", "B", "C", "D", "E", "F", "X", "Y", "M"}
@@ -209,7 +217,14 @@ class Lexer:
                 raw_tokens.append(Token(TokenType.E_CONST, "e", start, 1))
                 continue
 
-            # 7. Unrecognized character
+            # 7. Check imaginary unit i
+            if ch == "i":
+                start = self.pos
+                self.pos += 1
+                raw_tokens.append(Token(TokenType.I_IMAG, "i", start, 1))
+                continue
+
+            # 8. Unrecognized character
             raise SyntaxError(f"Unexpected character '{ch}'", position=self.pos)
 
         # Add EOF token
@@ -252,6 +267,7 @@ class Lexer:
             TokenType.CONSTANT if hasattr(TokenType, "CONSTANT") else None,
             TokenType.PI,
             TokenType.E_CONST,
+            TokenType.I_IMAG,
             TokenType.ANS,
             TokenType.PREANS,
             TokenType.RPAREN,
@@ -266,6 +282,7 @@ class Lexer:
             TokenType.VARIABLE,
             TokenType.PI,
             TokenType.E_CONST,
+            TokenType.I_IMAG,
             TokenType.ANS,
             TokenType.PREANS,
             TokenType.LPAREN,

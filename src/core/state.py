@@ -1,10 +1,11 @@
-"""Interaction state with math engine support, with no UI dependencies."""
+"""Interaction state with multi-mode calculator support, with no UI dependencies."""
 from dataclasses import dataclass, field
 
 MODES = ("COMP", "CMPLX", "STAT", "BASE-N", "EQN", "MATRIX", "TABLE", "VECTOR")
 ANGLES = ("DEG", "RAD", "GRA")
 DISPLAY_FORMATS = ("MthIO-MathO", "MthIO-LineO", "LineIO")
 NUMBER_FORMATS = ("Norm 1", "Norm 2", "Fix", "Sci")
+BASE_N_BASES = ("DEC", "HEX", "BIN", "OCT")
 
 @dataclass
 class CalculatorState:
@@ -25,7 +26,7 @@ class CalculatorState:
     last_action: str = ""
     deferred_actions: list[str] = field(default_factory=list)
 
-    # Phase 2 extensions
+    # Phase 2 fields
     is_evaluated: bool = False
     error_state: bool = False
     error_message: str = ""
@@ -38,6 +39,18 @@ class CalculatorState:
     prompt_value: str = ""
     pending_memory_op: str | None = None  # "STO" or "RCL"
 
+    # Phase 3 fields
+    complex_format: str = "a+bi"          # "a+bi" or "r∠θ"
+    base_n_mode: str = "DEC"              # "DEC", "HEX", "BIN", "OCT"
+    stat_type: str | None = None          # "1-VAR", "A+BX", etc.
+    stat_frequency_on: bool = False
+    table_editor_active: bool = False
+    active_sub_mode: str | None = None
+    grid_data: list[list[str]] = field(default_factory=list)
+    grid_headers: list[str] = field(default_factory=list)
+    grid_row: int = 0
+    grid_col: int = 0
+
     def validate(self) -> None:
         if self.mode not in MODES or self.angle_unit not in ANGLES:
             raise ValueError("Invalid mode or angle unit")
@@ -45,6 +58,8 @@ class CalculatorState:
             raise ValueError("Cursor out of bounds")
         if self.shift_active and self.alpha_active:
             raise ValueError("Both modifiers active")
+        if self.base_n_mode not in BASE_N_BASES:
+            raise ValueError("Invalid Base-N base")
 
     def reset(self) -> None:
         self.expression = ""
@@ -66,3 +81,8 @@ class CalculatorState:
         self.prompt_name = None
         self.prompt_value = ""
         self.pending_memory_op = None
+        self.table_editor_active = False
+        self.grid_data = []
+        self.grid_headers = []
+        self.grid_row = 0
+        self.grid_col = 0

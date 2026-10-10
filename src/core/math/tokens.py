@@ -67,6 +67,12 @@ class TokenType(Enum):
     INTEGRAL = auto()        # ∫
     SUMMATION = auto()       # Σ
 
+    # Complex & Functions
+    I_IMAG = auto()          # i
+    ARG = auto()             # arg
+    CONJG = auto()           # Conjg
+    ANGLE = auto()           # ∠ (polar angle)
+
     # End of Input
     EOF = auto()
 

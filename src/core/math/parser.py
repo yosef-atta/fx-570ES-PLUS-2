@@ -98,6 +98,10 @@ class Parser:
                 pos = self._previous().position
                 right = self._parse_unary()
                 node = BinaryOpNode(left=node, op="nCr", right=right, position=pos)
+            elif self._match(TokenType.ANGLE):
+                pos = self._previous().position
+                right = self._parse_unary()
+                node = BinaryOpNode(left=node, op="∠", right=right, position=pos)
             else:
                 break
 
@@ -175,6 +179,8 @@ class Parser:
             return ConstantNode(name="pi", position=token.position)
         if self._match(TokenType.E_CONST):
             return ConstantNode(name="e", position=token.position)
+        if self._match(TokenType.I_IMAG):
+            return ConstantNode(name="i", position=token.position)
 
         # 5. Parenthesized expression
         if self._match(TokenType.LPAREN):
@@ -200,7 +206,8 @@ class Parser:
             TokenType.SQRT, TokenType.CBRT, TokenType.NTH_ROOT,
             TokenType.ABS, TokenType.RND, TokenType.RAN_HASH, TokenType.RAN_INT,
             TokenType.POL, TokenType.REC,
-            TokenType.DERIVATIVE, TokenType.INTEGRAL, TokenType.SUMMATION
+            TokenType.DERIVATIVE, TokenType.INTEGRAL, TokenType.SUMMATION,
+            TokenType.ARG, TokenType.CONJG
         ):
             return self._parse_function_call()
 

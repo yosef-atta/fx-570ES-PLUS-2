@@ -17,6 +17,14 @@ class Formatter:
 
         reps: list[str] = []
 
+        # 0. Complex number representation
+        if isinstance(exact, sp.Expr) and exact.has(sp.I):
+            from src.core.modes.complex_engine import ComplexEngine
+            ce = ComplexEngine()
+            reps.append(ce.format_complex(exact, "a+bi"))
+            reps.append(ce.format_complex(exact, "r∠θ"))
+            return reps
+
         # 1. Exact representation if available
         if self.display_format.startswith("MthIO"):
             if isinstance(exact, sp.Rational) and exact.q != 1:

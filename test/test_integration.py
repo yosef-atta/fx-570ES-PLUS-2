@@ -230,12 +230,14 @@ def test_scenario_17_on_restores_interactive(application):
     assert window.controller.state.expression == "5"
     window.close()
 
-def test_scenario_18_unimplemented_actions_no_misleading_results(application):
+def test_scenario_18_const_prompt_and_insert(application):
     window = MainWindow()
     window.keypad.buttons["shift"].click()
     window.keypad.buttons["7"].click()
-    assert "Not implemented" in window.controller.state.result
-    assert window.controller.state.deferred_actions == ["const"]
+    assert window.controller.state.prompt_name == "CONST"
+    window.keypad.buttons["3"].click()
+    window.keypad.buttons["5"].click()
+    assert "g" in window.controller.state.expression
     window.close()
 
 def test_scenario_19_no_action_crashes_application(application):

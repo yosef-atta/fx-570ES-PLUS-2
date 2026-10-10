@@ -1,4 +1,4 @@
-"""Physical key mappings for fx-570ES PLUS-2 calculator."""
+"""Physical key mappings for fx-570ES PLUS-2 calculator across all 8 modes."""
 from dataclasses import dataclass
 from .action import Action
 
@@ -18,9 +18,9 @@ class Key:
 def make(id: str, label: str, row: int, col: int, *, primary: Action | None = None,
          shift: Action | None = None, alpha: Action | None = None,
          shift_label: str = "", alpha_label: str = "", category: str = "scientific") -> Key:
-    return Key(id, label, row, col, primary or Action.deferred(id), shift, alpha, shift_label, alpha_label, category)
+    return Key(id, label, row, col, primary or Action.command(id), shift, alpha, shift_label, alpha_label, category)
 
-I, C, D = Action.insert, Action.command, Action.deferred
+I, C = Action.insert, Action.command
 KEYS = (
     make("shift", "SHIFT", 0, 0, primary=C("shift"), category="modifier"),
     make("alpha", "ALPHA", 0, 1, primary=C("alpha"), category="modifier"),
@@ -38,7 +38,7 @@ KEYS = (
     make("power", "x^", 2, 1, primary=I("^"), shift=I("ˣ√("), shift_label="ˣ√□"),
     make("log", "log", 2, 2, primary=I("log("), shift=I("10ˣ("), shift_label="10ˣ"),
     make("ln", "ln", 2, 3, primary=I("ln("), shift=I("eˣ("), shift_label="eˣ", alpha=I("e"), alpha_label="e"),
-    make("negative", "(-)", 2, 4, primary=I("−"), shift=D("arg"), shift_label="arg", alpha=I("A"), alpha_label="A"),
+    make("negative", "(-)", 2, 4, primary=I("−"), shift=C("arg"), shift_label="arg", alpha=I("A"), alpha_label="A"),
     make("dms", "°′″", 2, 5, primary=I("°"), shift=C("arrow_dms"), shift_label="←", alpha=I("B"), alpha_label="B"),
     make("hyp", "hyp", 3, 0, primary=C("hyp"), shift=C("inv_hyp"), shift_label="hyp⁻¹", alpha=I("C"), alpha_label="C"),
     make("sin", "sin", 3, 1, primary=I("sin("), shift=I("sin⁻¹("), shift_label="sin⁻¹", alpha=I("D"), alpha_label="D"),
@@ -52,21 +52,21 @@ KEYS = (
     make("mplus", "M+", 4, 3, primary=C("mplus"), shift=C("mminus"), shift_label="M−", alpha=I("M"), alpha_label="M"),
     make("del", "DEL", 4, 4, primary=C("del"), shift=C("insert_toggle"), shift_label="INS", category="control"),
     make("ac", "AC", 4, 5, primary=C("ac"), shift=C("off"), shift_label="OFF", category="control"),
-    make("7", "7", 5, 0, primary=I("7"), shift=D("const"), shift_label="CONST", category="number"),
-    make("8", "8", 5, 1, primary=I("8"), shift=D("conv"), shift_label="CONV", category="number"),
+    make("7", "7", 5, 0, primary=I("7"), shift=C("const"), shift_label="CONST", category="number"),
+    make("8", "8", 5, 1, primary=I("8"), shift=C("conv"), shift_label="CONV", category="number"),
     make("9", "9", 5, 2, primary=I("9"), shift=C("clr"), shift_label="CLR", category="number"),
     make("divide", "÷", 5, 3, primary=I("÷"), shift=I("Pol("), shift_label="Pol", category="operator"),
     make("percent", "%", 5, 4, primary=I("%")),
     make("ans", "Ans", 5, 5, primary=I("Ans"), shift=I("%"), shift_label="%", alpha=I("PreAns"), alpha_label="PreAns"),
-    make("4", "4", 6, 0, primary=I("4"), category="number"),
-    make("5", "5", 6, 1, primary=I("5"), category="number"),
+    make("4", "4", 6, 0, primary=I("4"), shift=C("matrix_menu"), shift_label="MATRIX", category="number"),
+    make("5", "5", 6, 1, primary=I("5"), shift=C("vector_menu"), shift_label="VECTOR", category="number"),
     make("6", "6", 6, 2, primary=I("6"), category="number"),
     make("multiply", "×", 6, 3, primary=I("×"), shift=I("Rec("), shift_label="Rec", category="operator"),
     make("factorial", "x!", 6, 4, primary=I("!"), shift=I("!")),
     make("pi", "π", 6, 5, primary=I("π")),
-    make("1", "1", 7, 0, primary=I("1"), category="number"),
-    make("2", "2", 7, 1, primary=I("2"), category="number"),
-    make("3", "3", 7, 2, primary=I("3"), category="number"),
+    make("1", "1", 7, 0, primary=I("1"), shift=C("stat_menu"), shift_label="STAT", category="number"),
+    make("2", "2", 7, 1, primary=I("2"), shift=C("cmplx_menu"), shift_label="CMPLX", category="number"),
+    make("3", "3", 7, 2, primary=I("3"), shift=C("base_menu"), shift_label="BASE", category="number"),
     make("subtract", "−", 7, 3, primary=I("−"), shift=I("nPr"), shift_label="nPr", category="operator"),
     make("comma", ",", 7, 4, primary=I(",")),
     make("exp10", "×10ˣ", 7, 5, primary=I("×10^"), shift=I("π"), shift_label="π", alpha=I("e"), alpha_label="e"),
