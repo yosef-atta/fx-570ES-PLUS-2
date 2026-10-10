@@ -91,12 +91,12 @@ The application must support all documented calculator functions, familiar key b
 
 **Goal:** Deliver a complete Windows desktop application.
 
-- [ ] Add persistent preferences and configurable keyboard shortcuts.
-- [ ] Add application icon, metadata, and version information.
-- [ ] Package the application for offline Windows use.
-- [ ] Verify startup and calculator operation on a clean Windows environment.
-- [ ] Complete dependency/license checks and final release validation.
-- [ ] Produce the final Windows executable and installation instructions.
+- [x] Add persistent preferences and configurable keyboard shortcuts.
+- [x] Add application icon, metadata, and version information.
+- [x] Package the application for offline Windows use.
+- [x] Verify startup and calculator operation on a clean Windows environment.
+- [x] Complete dependency/license checks and final release validation.
+- [x] Produce the final Windows executable and installation instructions.
 
 **Done when:** The released application installs, launches, and works offline without a separate Python installation.
 
@@ -106,14 +106,14 @@ The application must support all documented calculator functions, familiar key b
 
 The project is finished only when:
 
-- [ ] All documented fx-570ES PLUS-2 features are covered.
-- [ ] All eight calculation modes work.
-- [ ] Natural mathematical input/output works.
-- [ ] All supported keyboard and mouse interactions work.
-- [ ] Automated tests pass.
-- [ ] No known critical bugs remain.
-- [ ] The application runs offline on Windows 10/11.
-- [ ] A distributable Windows release is available.
+- [x] All documented fx-570ES PLUS-2 features are covered.
+- [x] All eight calculation modes work.
+- [x] Natural mathematical input/output works.
+- [x] All supported keyboard and mouse interactions work.
+- [x] Automated tests pass.
+- [x] No known critical bugs remain.
+- [x] The application runs offline on Windows 10/11.
+- [x] A distributable Windows release is available.
 
 ## References
 
@@ -130,6 +130,6 @@ https://www.casio.com/content/dam/casio/global/support/manuals/calculators/pdf/2
 - [x] Install PySide6, SymPy, and pytest.
 - [x] Phase 1 — Application Foundation.
 - [x] Phase 2 — Core Mathematics & Display.
-- [ ] Phase 3 — Advanced Calculator Modes.
-- [ ] Phase 4 — Compatibility & Quality Assurance.
-- [ ] Phase 5 — Windows Release.
+- [x] Phase 3 — Advanced Calculator Modes.
+- [x] Phase 4 — Compatibility & Quality Assurance.
+- [x] Phase 5 — Windows Release.
