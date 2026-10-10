@@ -104,6 +104,25 @@ class CalculatorDisplay(QFrame):
             self.style().polish(self)
             return
 
+        # Prompt State rendering (Fix, Sci, Norm, CONST, CONV, etc.)
+        if state.prompt_name:
+            if state.prompt_name in ("Fix", "Sci"):
+                self.expression.setText(f"{state.prompt_name} 0~9?")
+            elif state.prompt_name == "Norm":
+                self.expression.setText("Norm 1~2?")
+            elif state.prompt_name == "CMPLX_FORMAT":
+                self.expression.setText("1: a+bi   2: r∠θ")
+            elif state.prompt_name == "STAT_FREQ":
+                self.expression.setText("STAT Frequency? 1:ON 2:OFF")
+            elif state.prompt_name == "CONST":
+                self.expression.setText(f"CONST Number 01~40? {getattr(state, 'prompt_value', '')}")
+            elif state.prompt_name == "CONV":
+                self.expression.setText(f"CONV Number 01~40? {getattr(state, 'prompt_value', '')}")
+            self.result.setText("")
+            self.style().unpolish(self)
+            self.style().polish(self)
+            return
+
         # Normal mathematical display rendering
         # Casio hardware switches cursor from '│' to solid block '■' when capacity remaining <= 10
         cursor_char = "■" if total_len >= 89 else "│"
