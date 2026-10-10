@@ -62,15 +62,15 @@ The application must support all documented calculator functions, familiar key b
 
 **Goal:** Implement all remaining calculation modes.
 
-- [ ] CMPLX — Complex number arithmetic and display.
-- [ ] STAT — Data entry, statistics, regression, and distributions.
-- [ ] BASE-N — Binary, octal, decimal, hexadecimal, and logical operations.
-- [ ] EQN — Equation systems and polynomial solving.
-- [ ] MATRIX — Matrix editing and operations.
-- [ ] TABLE — Function tables for f(x) and g(x).
-- [ ] VECTOR — Vector editing and operations.
-- [ ] Implement scientific constants, metric conversions, and any remaining documented features.
-- [ ] Add automated tests for every mode.
+- [x] CMPLX — Complex number arithmetic and display.
+- [x] STAT — Data entry, statistics, regression, and distributions.
+- [x] BASE-N — Binary, octal, decimal, hexadecimal, and logical operations.
+- [x] EQN — Equation systems and polynomial solving.
+- [x] MATRIX — Matrix editing and operations.
+- [x] TABLE — Function tables for f(x) and g(x).
+- [x] VECTOR — Vector editing and operations.
+- [x] Implement scientific constants, metric conversions, and any remaining documented features.
+- [x] Add automated tests for every mode.
 
 **Done when:** Every documented calculator mode and operation is implemented and tested.
 

@@ -15,9 +15,9 @@ def test_numeric_keys_insert():
         action = resolve(digit)
         assert action.kind is Kind.INSERT and action.text == digit
 
-def test_scientific_actions_are_explicitly_deferred():
-    assert resolve("7", "shift").kind is Kind.DEFERRED  # CONST deferred to Phase 3
-    assert resolve("8", "shift").kind is Kind.DEFERRED  # CONV deferred to Phase 3
+def test_scientific_actions_are_active_in_phase_3():
+    assert resolve("7", "shift").name == "const"
+    assert resolve("8", "shift").name == "conv"
     assert resolve("equals").name == "evaluate"
     assert resolve("sin").kind is Kind.INSERT
     assert resolve("sqrt").kind is Kind.INSERT

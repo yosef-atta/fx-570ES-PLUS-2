@@ -33,9 +33,15 @@ class EvaluationResult:
 class Evaluator:
     """Evaluates an AST under given angle units and memory variables."""
 
-    def __init__(self, angle_unit: str = "DEG", memory: dict[str, sp.Expr | float] | None = None):
+    def __init__(
+        self,
+        angle_unit: str = "DEG",
+        memory: dict[str, sp.Expr | float] | None = None,
+        mode: str = "COMP"
+    ):
         self.angle_unit = angle_unit  # "DEG", "RAD", "GRA"
         self.memory = memory if memory is not None else {}
+        self.mode = mode
 
     def evaluate(self, node: ASTNode) -> EvaluationResult:
         res = self._eval_node(node)
@@ -74,6 +80,8 @@ class Evaluator:
                 return sp.pi
             if node.name == "e":
                 return sp.E
+            if node.name == "i":
+                return sp.I
             raise ArgumentError(f"Unknown constant {node.name}", position=node.position)
 
         if isinstance(node, AnsNode):
@@ -179,13 +187,26 @@ class Evaluator:
                     raise MathError("Math ERROR (0^0 or division by zero)", position=node.position)
                 res = left ** right
                 # If result is complex, in COMP mode raise Math ERROR
-                if getattr(res, "is_real", None) is False:
+                if self.mode != "CMPLX" and getattr(res, "is_real", None) is False:
                     raise MathError("Non-real result in COMP mode", position=node.position)
                 return res
             except Exception as e:
                 if isinstance(e, MathError):
                     raise
                 raise MathError(str(e), position=node.position)
+
+        if node.op == "∠":
+            r_val = float(sp.N(left))
+            th_val = float(sp.N(right))
+            if self.angle_unit == "DEG":
+                th_rad = math.radians(th_val)
+            elif self.angle_unit == "GRA":
+                th_rad = th_val * math.pi / 200
+            else:
+                th_rad = th_val
+            real_part = r_val * math.cos(th_rad)
+            imag_part = r_val * math.sin(th_rad)
+            return sp.Float(round(real_part, 10)) + sp.I * sp.Float(round(imag_part, 10))
 
         if node.op == "nPr":
             # Permutations: n! / (n - r)!
@@ -341,7 +362,7 @@ class Evaluator:
         # Square roots & Roots
         if name == "sqrt":
             try:
-                if float(sp.N(x)) < 0:
+                if self.mode != "CMPLX" and float(sp.N(x)) < 0:
                     raise MathError("Negative square root in COMP mode", position=node.position)
             except MathError:
                 raise
@@ -400,6 +421,21 @@ class Evaluator:
             self.memory["X"] = x_coord
             self.memory["Y"] = y_coord
             return x_coord
+
+        # Complex Functions
+        if name == "arg":
+            z_c = complex(sp.N(x))
+            theta_rad = math.atan2(z_c.imag, z_c.real)
+            if self.angle_unit == "DEG":
+                theta = theta_rad * 180 / math.pi
+            elif self.angle_unit == "GRA":
+                theta = theta_rad * 200 / math.pi
+            else:
+                theta = theta_rad
+            return sp.Float(round(theta, 10))
+
+        if name in ("conjg", "conjugate"):
+            return sp.conjugate(x)
 
         raise SyntaxError(f"Unknown function {name}", position=node.position)
 

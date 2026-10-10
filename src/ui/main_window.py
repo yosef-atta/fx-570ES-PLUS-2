@@ -7,6 +7,7 @@ from src.input.keyboard import key_to_id
 from .calculator_display import CalculatorDisplay
 from .keypad import Keypad
 from .menu_view import MenuView
+from .table_view import TableView
 from .style import STYLESHEET
 
 class MainWindow(QMainWindow):
@@ -28,11 +29,13 @@ class MainWindow(QMainWindow):
         subtitle = QLabel("OFFLINE  •  WINDOWS  •  SCIENTIFIC")
         subtitle.setObjectName("subtitle")
         self.display = CalculatorDisplay()
+        self.table_view = TableView()
         self.menu = MenuView()
         self.keypad = Keypad()
         layout.addWidget(brand)
         layout.addWidget(subtitle)
         layout.addWidget(self.display)
+        layout.addWidget(self.table_view)
         layout.addWidget(self.menu)
         layout.addWidget(self.keypad)
         self.setCentralWidget(shell)
@@ -41,6 +44,7 @@ class MainWindow(QMainWindow):
 
     def refresh(self, state):
         self.display.render(state)
+        self.table_view.update_grid(state)
         self.menu.render(state)
 
     def keyPressEvent(self, event):
