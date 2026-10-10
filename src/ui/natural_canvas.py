@@ -13,8 +13,10 @@ def render_natural_math(expr_text: str, cursor_pos: int, is_natural: bool = True
         return html.escape(text_with_cursor)
 
     # Convert natural mathematical conventions to rich text
-    # 1. Superscript powers like ^2, ^3, ^(x)
     s = html.escape(text_with_cursor)
+
+    # Format mixed fraction text to Casio ⌟ symbol
+    s = s.replace("mixed/", "⌟")
 
     # Format square and cube symbols
     s = s.replace("²", "<sup>2</sup>")
@@ -37,8 +39,8 @@ def render_natural_result(result_text: str, is_natural: bool = True) -> str:
     if not is_natural:
         return html.escape(result_text)
 
-    # 1. Mixed fraction: W N/D e.g. "2 1/3" or "-2 1/3"
-    mixed_match = re.match(r'^(-?\d+)\s+(\d+)/(\d+)$', result_text.strip())
+    # 1. Mixed fraction: W N/D e.g. "2 1/3" or "-2 1/3" or "2⌟1⌟3"
+    mixed_match = re.match(r'^(-?\d+)[\s⌟]+(\d+)[/⌟](\d+)$', result_text.strip())
     if mixed_match:
         whole, num, den = mixed_match.groups()
         return (
@@ -49,8 +51,8 @@ def render_natural_result(result_text: str, is_natural: bool = True) -> str:
             f'</table>'
         )
 
-    # 2. Simple fraction: N/D e.g. "109/9000", "-5/6"
-    frac_match = re.match(r'^(-?\d+)/(\d+)$', result_text.strip())
+    # 2. Simple fraction: N/D e.g. "109/9000", "-5/6" or "1⌟3"
+    frac_match = re.match(r'^(-?\d+)[/⌟](\d+)$', result_text.strip())
     if frac_match:
         num, den = frac_match.groups()
         return (

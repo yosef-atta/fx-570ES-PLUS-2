@@ -28,6 +28,13 @@ KEYWORDS: list[tuple[str, TokenType]] = [
     ("°'\"", TokenType.DMS),
     ("°", TokenType.DMS),
 
+    # Mixed Fraction & Fraction Separators
+    ("mixed/", TokenType.MIXED_FRACTION),
+    ("mixed", TokenType.MIXED_FRACTION),
+    ("⌟", TokenType.MIXED_FRACTION),
+    ("┘", TokenType.MIXED_FRACTION),
+    ("_", TokenType.MIXED_FRACTION),
+
     # Calculus & Special
     ("d/dx", TokenType.DERIVATIVE),
     ("∫", TokenType.INTEGRAL),
