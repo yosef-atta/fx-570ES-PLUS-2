@@ -16,8 +16,10 @@ KEYS = {
 CHARACTERS = {
     "+": "add", "-": "subtract", "*": "multiply", "/": "divide",
     ".": "dot", ",": "comma", "(": "lparen", ")": "rparen",
-    "=": "equals", "^": "power", "%": "percent",
+    "=": "equals", "^": "power", "%": "percent", "!": "factorial",
     "x": "multiply", "X": "multiply",
+    "s": "sin", "c": "cos", "t": "tan", "l": "ln", "r": "sqrt",
+    "i": "eng", "p": "pi",
 }
 
 def key_to_id(event) -> str | None:

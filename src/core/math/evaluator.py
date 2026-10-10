@@ -135,6 +135,10 @@ class Evaluator:
             return self._eval_summation(node)
 
         if isinstance(node, EquationNode):
+            if isinstance(node.left, VariableNode):
+                val = self._eval_node(node.right)
+                self.memory[node.left.name.upper()] = val
+                return val
             # For equation, returns left - right
             left = self._eval_node(node.left)
             right = self._eval_node(node.right)
