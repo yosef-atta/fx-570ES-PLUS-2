@@ -2,12 +2,12 @@
 import html
 import re
 
-def render_natural_math(expr_text: str, cursor_pos: int, is_natural: bool = True) -> str:
+def render_natural_math(expr_text: str, cursor_pos: int, is_natural: bool = True, cursor_char: str = "│") -> str:
     """Formats an expression string with cursor for LCD display.
     In natural mode (MthIO), powers, roots, and fractions use rich HTML formatting."""
     # Insert cursor character
     pos = max(0, min(len(expr_text), cursor_pos))
-    text_with_cursor = expr_text[:pos] + "│" + expr_text[pos:]
+    text_with_cursor = expr_text[:pos] + cursor_char + expr_text[pos:]
 
     if not is_natural:
         return html.escape(text_with_cursor)

@@ -459,6 +459,10 @@ class Controller:
             s.cursor_position = max(0, s.cursor_position - 1)
         elif action.name == "right":
             s.cursor_position = min(len(s.expression), s.cursor_position + 1)
+        elif action.name == "home":
+            s.cursor_position = 0
+        elif action.name == "end":
+            s.cursor_position = len(s.expression)
         elif action.name == "mode":
             self._open_menu("MODE")
         elif action.name == "setup":
@@ -482,6 +486,13 @@ class Controller:
     def _insert_text(self, text: str) -> None:
         s = self.state
         if len(s.expression) >= 99:
+            try:
+                from PySide6.QtWidgets import QApplication
+                app = QApplication.instance()
+                if app:
+                    app.beep()
+            except Exception:
+                pass
             return
         if len(s.expression) + len(text) > 99:
             text = text[:99 - len(s.expression)]

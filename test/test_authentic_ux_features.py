@@ -1,6 +1,7 @@
 """Tests for authentic Casio fx-570ES PLUS 2nd Edition UX, display and recurring decimal features."""
 from fractions import Fraction
 from PySide6.QtCore import Qt
+from src.core.action import Action
 from src.core.controller import Controller
 from src.core.state import CalculatorState
 from src.core.math.lexer import Lexer
@@ -54,8 +55,8 @@ def test_display_horizontal_scrolling_indicators(application):
     assert "▶" not in disp.indicators.text()
 
     # Long expression with cursor at the end: left arrow ◀ must show
-    long_expr = "12345678901234567890"  # 20 chars > 16 MAX_VISIBLE
-    disp.render(CalculatorState(expression=long_expr, cursor_position=20))
+    long_expr = "1234567890" * 4  # 40 chars > 26 MAX_VISIBLE
+    disp.render(CalculatorState(expression=long_expr, cursor_position=40))
     assert "◀" in disp.indicators.text()
     assert "▶" not in disp.indicators.text()
 
@@ -65,10 +66,51 @@ def test_display_horizontal_scrolling_indicators(application):
     assert "▶" in disp.indicators.text()
 
     # Cursor in middle: both arrows show
-    disp.render(CalculatorState(expression=long_expr, cursor_position=10))
+    disp.render(CalculatorState(expression=long_expr, cursor_position=20))
     assert "◀" in disp.indicators.text()
     assert "▶" in disp.indicators.text()
     disp.close()
+
+
+def test_casio_capacity_block_cursor_and_full_indicator(application):
+    """Verify Casio hardware behavior: cursor switches to block ■ at <= 10 bytes remaining, and FULL status."""
+    disp = CalculatorDisplay()
+
+    # Standard cursor under 89 characters
+    state_normal = CalculatorState(expression="1" * 50, cursor_position=50)
+    disp.render(state_normal)
+    assert "│" in disp.expression.text()
+    assert "FULL" not in disp.indicators.text()
+
+    # Approaching capacity (89 to 98 chars): cursor switches to solid block ■
+    state_near_full = CalculatorState(expression="1" * 89, cursor_position=89)
+    disp.render(state_near_full)
+    assert "■" in disp.expression.text()
+    assert "[89/99]" in disp.indicators.text()
+
+    # Completely full (99 chars): cursor is ■ and FULL appears in status bar
+    state_full = CalculatorState(expression="1" * 99, cursor_position=99)
+    disp.render(state_full)
+    assert "■" in disp.expression.text()
+    assert "FULL" in disp.indicators.text()
+    disp.close()
+
+
+def test_home_and_end_navigation():
+    """Verify Home and End actions jump to beginning and end of long input."""
+    c = Controller()
+    c.press("1")
+    c.press("2")
+    c.press("3")
+    assert c.state.cursor_position == 3
+
+    # Home jumps to 0
+    c.dispatch(Action.command("home"))
+    assert c.state.cursor_position == 0
+
+    # End jumps to end (3)
+    c.dispatch(Action.command("end"))
+    assert c.state.cursor_position == 3
 
 
 def test_display_history_indicators(application):

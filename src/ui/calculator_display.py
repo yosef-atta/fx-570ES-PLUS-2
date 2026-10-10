@@ -45,12 +45,13 @@ class CalculatorDisplay(QFrame):
 
         self.setProperty("power", "on")
         
-        # Calculate horizontal scrolling window for expression
-        MAX_VISIBLE = 16
+        # Calculate horizontal scrolling window for expression (expanded to 26 for wider Casio LCD)
+        MAX_VISIBLE = 26
         expr = state.expression
         pos = state.cursor_position
+        total_len = len(expr)
         
-        if len(expr) <= MAX_VISIBLE:
+        if total_len <= MAX_VISIBLE:
             visible_expr = expr
             cursor_idx = pos
             has_left = False
@@ -58,12 +59,12 @@ class CalculatorDisplay(QFrame):
         else:
             half = MAX_VISIBLE // 2
             start = pos - half
-            start = max(0, min(len(expr) - MAX_VISIBLE, start))
+            start = max(0, min(total_len - MAX_VISIBLE, start))
             end = start + MAX_VISIBLE
             visible_expr = expr[start:end]
             cursor_idx = pos - start
             has_left = (start > 0)
-            has_right = (end < len(expr))
+            has_right = (end < total_len)
 
         flags = [state.mode, state.angle_unit]
         if state.display_format.startswith("MthIO"):
@@ -88,6 +89,11 @@ class CalculatorDisplay(QFrame):
             flags.append("▲")
         if getattr(state, "history_has_next", False):
             flags.append("▼")
+        # Capacity indicator matching physical Casio notification
+        if total_len >= 99:
+            flags.append("FULL")
+        elif total_len >= 89:
+            flags.append(f"[{total_len}/99]")
         self.indicators.setText("   ".join(flags))
 
         # Error State rendering
@@ -99,8 +105,10 @@ class CalculatorDisplay(QFrame):
             return
 
         # Normal mathematical display rendering
+        # Casio hardware switches cursor from '│' to solid block '■' when capacity remaining <= 10
+        cursor_char = "■" if total_len >= 89 else "│"
         is_natural = state.display_format.startswith("MthIO")
-        rendered_expr = render_natural_math(visible_expr, cursor_idx, is_natural=is_natural)
+        rendered_expr = render_natural_math(visible_expr, cursor_idx, is_natural=is_natural, cursor_char=cursor_char)
         self.expression.setText(rendered_expr)
         
         rendered_result = render_natural_result(state.result, is_natural=is_natural)
