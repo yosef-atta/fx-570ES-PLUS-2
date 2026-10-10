@@ -715,7 +715,23 @@ class Controller:
 
     def _toggle_mixed_sd(self) -> None:
         s = self.state
-        if len(s.result_representations) >= 2:
+        if not s.result_representations:
+            return
+        mixed_idx = None
+        improper_idx = None
+        for i, rep in enumerate(s.result_representations):
+            if " " in rep and "/" in rep:
+                mixed_idx = i
+            elif "/" in rep and " " not in rep:
+                improper_idx = i
+
+        if mixed_idx is not None and improper_idx is not None:
+            if s.representation_index == mixed_idx:
+                s.representation_index = improper_idx
+            else:
+                s.representation_index = mixed_idx
+            s.result = s.result_representations[s.representation_index]
+        elif len(s.result_representations) >= 2:
             s.representation_index = 1 if s.representation_index == 0 else 0
             s.result = s.result_representations[s.representation_index]
 

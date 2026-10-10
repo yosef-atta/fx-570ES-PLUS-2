@@ -31,15 +31,20 @@ class Formatter:
             reps.append(self.format_number(numeric))
 
         # 2. Exact representation if available
-        if self.display_format.startswith("MthIO"):
+        if self.display_format.startswith("MthIO") or self.display_format == "ab/c":
             if isinstance(exact, sp.Rational) and exact.q != 1:
-                # Proper or improper fraction
                 frac_str = self._format_rational(exact)
-                if frac_str not in reps:
-                    reps.append(frac_str)
-                # Mixed fraction if |numerator| > denominator
-                if abs(exact.p) > exact.q:
-                    reps.append(self._format_mixed_rational(exact))
+                mixed_str = self._format_mixed_rational(exact) if abs(exact.p) > exact.q else None
+                if self.display_format == "ab/c" and mixed_str:
+                    if mixed_str not in reps:
+                        reps.append(mixed_str)
+                    if frac_str not in reps:
+                        reps.append(frac_str)
+                else:
+                    if frac_str not in reps:
+                        reps.append(frac_str)
+                    if mixed_str and mixed_str not in reps:
+                        reps.append(mixed_str)
             elif isinstance(exact, sp.Expr) and not isinstance(exact, (sp.Integer, sp.Float)):
                 exact_str = self._format_exact_expr(exact)
                 if exact_str not in reps:

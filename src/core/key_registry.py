@@ -32,7 +32,7 @@ KEYS = (
     make("on", "ON", 1, 1, primary=C("on"), category="control"),
     make("calc", "CALC", 1, 2, primary=C("calc"), shift=C("solve"), shift_label="SOLVE", alpha=I("="), alpha_label="="),
     make("integral", "∫", 1, 3, primary=I("∫("), shift=I("d/dx("), shift_label="d/dx", alpha=I(":"), alpha_label=":"),
-    make("fraction", "□/□", 1, 4, primary=I("/"), shift=I("mixed/"), shift_label="■□/□"),
+    make("fraction", "□/□", 1, 4, primary=I("/"), shift=I("⌟"), shift_label="■□/□"),
     make("sqrt", "√", 1, 5, primary=I("√("), shift=I("³√("), shift_label="³√"),
     make("square", "x²", 2, 0, primary=I("²"), shift=I("³"), shift_label="x³"),
     make("power", "x^", 2, 1, primary=I("^"), shift=I("ˣ√("), shift_label="ˣ√□"),

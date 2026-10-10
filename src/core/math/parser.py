@@ -1,7 +1,7 @@
 """Recursive descent parser with Casio fx-570ES PLUS operator precedence and auto-closing parentheses."""
 from .ast_nodes import (
     ASTNode, NumberNode, VariableNode, ConstantNode, AnsNode, PreAnsNode,
-    UnaryOpNode, BinaryOpNode, PostfixOpNode, FractionNode,
+    UnaryOpNode, BinaryOpNode, PostfixOpNode, FractionNode, MixedFractionNode,
     FunctionCallNode, DerivativeNode, IntegralNode, SummationNode,
     EquationNode, MultiStatementNode, DMSNode
 )
@@ -128,8 +128,19 @@ class Parser:
         return node
 
     def _parse_postfix(self) -> ASTNode:
-        """Postfix operators: factorials (!), percentages (%), DMS (°)."""
+        """Postfix operators: factorials (!), percentages (%), DMS (°), and mixed fractions."""
         node = self._parse_primary()
+
+        # Infix mixed fraction: <whole> mixed/ <num> / <den> or <whole> ⌟ <num> ⌟ <den>
+        if self._match(TokenType.MIXED_FRACTION):
+            pos = self._previous().position
+            second = self._parse_primary()
+            if self._match(TokenType.DIVIDE) or self._match(TokenType.MIXED_FRACTION):
+                third = self._parse_primary()
+                node = MixedFractionNode(whole=node, numerator=second, denominator=third, position=pos)
+            else:
+                # Single separator: e.g. 1⌟3 -> 1/3
+                node = FractionNode(numerator=node, denominator=second, position=pos)
 
         while True:
             if self._match(TokenType.FACTORIAL):
@@ -159,6 +170,42 @@ class Parser:
 
     def _parse_primary(self) -> ASTNode:
         token = self._current()
+
+        # 0. Prefix mixed fraction (e.g. mixed/ 2/1/3 or mixed/(2, 1, 3))
+        if self._match(TokenType.MIXED_FRACTION):
+            pos = self._previous().position
+            if self._match(TokenType.LPAREN):
+                self.open_paren_count += 1
+                first = self._parse_expression()
+                if self._match(TokenType.COMMA):
+                    second = self._parse_expression()
+                    if self._match(TokenType.COMMA):
+                        third = self._parse_expression()
+                        if self._match(TokenType.RPAREN):
+                            self.open_paren_count -= 1
+                        elif self._current().type == TokenType.EOF:
+                            self.open_paren_count -= 1
+                        return MixedFractionNode(whole=first, numerator=second, denominator=third, position=pos)
+                    else:
+                        if self._match(TokenType.RPAREN):
+                            self.open_paren_count -= 1
+                        elif self._current().type == TokenType.EOF:
+                            self.open_paren_count -= 1
+                        return FractionNode(numerator=first, denominator=second, position=pos)
+                else:
+                    if self._match(TokenType.RPAREN):
+                        self.open_paren_count -= 1
+                    return first
+            else:
+                first = self._parse_primary()
+                if self._match(TokenType.DIVIDE) or self._match(TokenType.MIXED_FRACTION):
+                    second = self._parse_primary()
+                    if self._match(TokenType.DIVIDE) or self._match(TokenType.MIXED_FRACTION):
+                        third = self._parse_primary()
+                        return MixedFractionNode(whole=first, numerator=second, denominator=third, position=pos)
+                    else:
+                        return FractionNode(numerator=first, denominator=second, position=pos)
+                return first
 
         # 1. Number
         if self._match(TokenType.NUMBER):

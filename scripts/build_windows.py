@@ -23,20 +23,28 @@ def build():
         from scripts.generate_icon import main as gen_icons
         gen_icons()
 
-    # 2. PyInstaller command arguments
+    # 2. Clean previous dist/build if present
+    target_dist = os.path.join(dist_dir, "Casio-fx570ES-PLUS-2")
+    if os.path.exists(target_dist):
+        try:
+            shutil.rmtree(target_dist)
+        except Exception:
+            pass
+
+    # 3. PyInstaller command arguments
     cmd = [
         sys.executable,
         "-m",
         "PyInstaller",
         "--noconsole",
         "--windowed",
+        "--noconfirm",
         "--clean",
         "--name", "Casio-fx570ES-PLUS-2",
         "--icon", icon_path,
         "--add-data", f"{assets_dir};src/ui/assets",
         "--collect-submodules", "sympy",
         "--collect-submodules", "mpmath",
-        "--collect-submodules", "PySide6",
         app_entry,
     ]
 
