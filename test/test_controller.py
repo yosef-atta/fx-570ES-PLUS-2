@@ -41,8 +41,9 @@ def test_off_and_on():
 
 def test_deferred_is_never_a_fake_result():
     c = Controller()
-    c.press("sin")
-    assert c.state.deferred_actions == ["sin"]
+    c.press("shift")
+    c.press("7")  # CONST deferred to Phase 3
+    assert c.state.deferred_actions == ["const"]
     assert "Not implemented" in c.state.result
 
 def test_modifiers_are_exclusive_and_one_shot():

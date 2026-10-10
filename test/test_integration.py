@@ -232,12 +232,10 @@ def test_scenario_17_on_restores_interactive(application):
 
 def test_scenario_18_unimplemented_actions_no_misleading_results(application):
     window = MainWindow()
-    window.keypad.buttons["sin"].click()
+    window.keypad.buttons["shift"].click()
+    window.keypad.buttons["7"].click()
     assert "Not implemented" in window.controller.state.result
-    assert window.controller.state.deferred_actions == ["sin"]
-    # Equals is also deferred in Phase 1
-    window.keypad.buttons["equals"].click()
-    assert "Not implemented" in window.controller.state.result
+    assert window.controller.state.deferred_actions == ["const"]
     window.close()
 
 def test_scenario_19_no_action_crashes_application(application):

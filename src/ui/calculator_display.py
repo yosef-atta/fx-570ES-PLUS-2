@@ -1,7 +1,8 @@
-"""Read-only LCD display with cursor and mode indicators."""
+"""Read-only LCD display with natural textbook rendering, cursor, and mode indicators."""
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QFrame, QLabel, QVBoxLayout
 from src.core.state import CalculatorState
+from .natural_canvas import render_natural_math
 
 class CalculatorDisplay(QFrame):
     def __init__(self, parent=None):
@@ -23,6 +24,7 @@ class CalculatorDisplay(QFrame):
 
         self.expression.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
         self.expression.setTextInteractionFlags(Qt.TextInteractionFlag.NoTextInteraction)
+        self.expression.setTextFormat(Qt.TextFormat.RichText)
         layout.addWidget(self.expression)
 
         self.result.setAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
@@ -44,6 +46,8 @@ class CalculatorDisplay(QFrame):
         flags = [state.mode, state.angle_unit]
         if state.display_format.startswith("MthIO"):
             flags.append("Math")
+        if state.has_memory:
+            flags.append("M")
         if state.number_format.startswith("Fix"):
             flags.append("FIX")
         elif state.number_format.startswith("Sci"):
@@ -56,13 +60,18 @@ class CalculatorDisplay(QFrame):
             flags.append("INS")
         self.indicators.setText("   ".join(flags))
 
-        pos = state.cursor_position
-        full_text = state.expression[:pos] + "│" + state.expression[pos:]
-        if len(full_text) <= 55:
-            self.expression.setText(full_text)
-        else:
-            start = max(0, min(pos - 25, len(full_text) - 55))
-            self.expression.setText(full_text[start:start + 55])
+        # Error State rendering
+        if state.error_state:
+            self.expression.setText(f"<b>{state.error_message}</b>")
+            self.result.setText(state.result)
+            self.style().unpolish(self)
+            self.style().polish(self)
+            return
+
+        # Normal mathematical display rendering
+        is_natural = state.display_format.startswith("MthIO")
+        rendered_expr = render_natural_math(state.expression, state.cursor_position, is_natural=is_natural)
+        self.expression.setText(rendered_expr)
         self.result.setText(state.result)
         self.style().unpolish(self)
         self.style().polish(self)
