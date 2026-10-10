@@ -67,6 +67,17 @@ class Controller:
         callback(self.state)
 
     def notify(self) -> None:
+        self.state.has_memory = self.memory.has_independent_memory
+        if self.memory.history:
+            if self.memory.history_index is None:
+                self.state.history_has_prev = True
+                self.state.history_has_next = False
+            else:
+                self.state.history_has_prev = self.memory.history_index > 0
+                self.state.history_has_next = self.memory.history_index < len(self.memory.history) - 1
+        else:
+            self.state.history_has_prev = False
+            self.state.history_has_next = False
         self.state.validate()
         for callback in self.listeners:
             callback(self.state)
@@ -470,6 +481,10 @@ class Controller:
 
     def _insert_text(self, text: str) -> None:
         s = self.state
+        if len(s.expression) >= 99:
+            return
+        if len(s.expression) + len(text) > 99:
+            text = text[:99 - len(s.expression)]
         position = s.cursor_position
         if s.input_mode == "Overwrite" and position < len(s.expression):
             end_pos = min(len(s.expression), position + len(text))

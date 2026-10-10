@@ -38,6 +38,8 @@ class CalculatorState:
     prompt_name: str | None = None
     prompt_value: str = ""
     pending_memory_op: str | None = None  # "STO" or "RCL"
+    history_has_prev: bool = False
+    history_has_next: bool = False
 
     # Phase 3 fields
     complex_format: str = "a+bi"          # "a+bi" or "r∠θ"
